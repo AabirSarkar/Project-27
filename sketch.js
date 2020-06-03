@@ -4,66 +4,74 @@ const Bodies = Matter.Bodies;
 const Constraint = Matter.Constraint;
 
 var engine, world;
-var box1, pig1;
-var backgroundImg,platform;
-var constrainedLog;
-function preload() {
-    backgroundImg = loadImage("sprites/bg.png");
-}
+
+var base,ball,string;
 
 function setup(){
-    var canvas = createCanvas(1200,400);
+    var canvas = createCanvas(850,700);
     engine = Engine.create();
     world = engine.world;
-
-
-    ground = new Ground(600,height,1200,20);
-    platform = new Ground(150, 305, 300, 170);
-
-    box1 = new Box(700,320,70,70);
-    box2 = new Box(920,320,70,70);
-    pig1 = new Pig(810, 350);
-    log1 = new Log(810,260,300, PI/2);
+    var base_options={
+        isStatic: true
+    }
+    base = Bodies.rectangle(400,150,800,20,base_options);
+    World.add(world,base);
     
-    box3 = new Box(700,240,70,70);
-    box4 = new Box(920,240,70,70);
-    pig3 = new Pig(810, 220);
+    var ball_options={
+        density:0.2,
+        restitution:0.9,
+        frictionAir:0
+    }
+    ball = Bodies.circle(100,250,40,ball_options);
+    World.add(world,ball);
+    
+    var string_options={
+        bodyA: base,
+        bodyB: ball,
+        stiffness:1,
+        length: 300
+    }
+    string = Constraint.create(string_options);
+    World.add(world,string);
 
-    log3 =  new Log(810,180,300, PI/2);
 
-    box5 = new Box(810,160,70,70);
-    log4 = new Log(760,120,150, PI/7);
-    log5 = new Log(870,120,150, -PI/7);
-    log6 = new Log(230,180,80,PI/2);
-    bird = new Bird(100,100);
-    chain = new Chain(bird.body,log6.body)
+    
    
 }
 
 function draw(){
-    background(backgroundImg);
+    background(0);
     Engine.update(engine);
-    console.log(box2.body.position.x);
-    console.log(box2.body.position.y);
-    console.log(box2.body.angle);
-    box1.display();
-    box2.display();
-    ground.display();
-    pig1.display();
-    log1.display();
+    rectMode(CENTER);
+    fill("brown");
+    rect(base.position.x,base.position.y,200,20);
+    
+    strokeWeight(4);
+    stroke(255);
+    line(base.position.x,base.position.y,ball.position.x,ball.position.y);
 
-    box3.display();
-    box4.display();
-    pig3.display();
-    log3.display();
+    noStroke();
+    ellipseMode(RADIUS);
+    fill("yellow");
+    ellipse(ball.position.x,ball.position.y,40);
 
-    box5.display();
-    log4.display();
-    log5.display();
+    fill(255);
+    text("SPACE ---> set position",600,600);
+    text("R ---> to release",600,650);
+    textSize(20);
+    text("OSCILLATING PENDULUM",50,50);
+   // Matter.Body.setAngularVelocity(ball, 2);
 
-    bird.display();
-    platform.display();
-    log6.display();
-    chain.display();
+    if(keyCode===32){
+        Matter.Body.setPosition(ball, {x:100,y:250})
+        
+    }
+    if(keyCode===82){
+        Matter.Body.setStatic(ball, false);
+        //Matter.Body.applyForce(ball.body,ball.body.position, {x:20,y:20})
+    }
+   // ball.display();
+    //attach.display();
+    
 
 }
